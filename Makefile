@@ -1,8 +1,8 @@
 CC = g++
 TARGET = run
 
-CFLAGS_RELEASE =-O3 -Iinclude -Wall -pedantic -pedantic-errors -g3 -std=gnu++20 -DNDEBUG $(shell sdl2-config --cflags)
-CFLAGS_DEBUG = -O3 -Iinclude -Wall -pedantic -pedantic-errors -g3 -std=gnu++20 -fsanitize=address $(shell sdl2-config --cflags)
+CFLAGS_RELEASE = -mavx -mavx2 -mfma -mavx512vl -O2 -Iinclude -Wall -pedantic -pedantic-errors -g3 -std=gnu++20 -DNDEBUG $(shell sdl2-config --cflags)
+CFLAGS_DEBUG = -mavx -mavx2 -mfma -mavx512vl -O2 -Iinclude -Wall -pedantic -pedantic-errors -g3 -std=gnu++20 -fsanitize=address $(shell sdl2-config --cflags)
 LDFLAGS=$(shell sdl2-config --libs) -lSDL2 -lSDL2_image
 DEPFLAGS = -MMD -MP
 

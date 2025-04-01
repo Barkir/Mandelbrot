@@ -15,10 +15,10 @@ int main(int argc, char * argv[])
 
 /*---------------------------------------------------------------------------------------------------------*/
 
-    int graph_flag = NO_GRAPH;
+    int graph_flag = SSE_NGRAPH;
     if (argc >= 2)
     {
-        if (!strcmp(argv[1], "--graph"))        {graph_flag = GRAPH;   LOG("set GRAPH flag"); }
+        if (!strcmp(argv[1], "--graph"))        {graph_flag = SSE_GRAPH;   LOG("set GRAPH flag"); }
         else if (!strcmp(argv[1], "--ngraph"))  {LOG("set NO_GRAPH flag");}
 
     }
