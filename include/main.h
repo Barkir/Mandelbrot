@@ -48,7 +48,7 @@ struct Transform
     float dely;
 };
 
-typedef void (*Mandelfunc) (void*, int*, Transform *);
+typedef void (*Mandelfunc) (void*, int*, void *);
 
 struct Mandelparam
 {
@@ -64,20 +64,5 @@ struct Mandelparam
 
 };
 
-
-void inline add4(float * a, float * b, float * save);
-void inline sub4(float * a, float * b, float * save);
-void inline print4(float * val);
-void inline mul4(float * a, float * b, float * save);
-void inline cmple4(float * a, float * b, float * save);
-void inline mulnum(float * a, float val, float * save);
-int inline isnull4(float * a);
-
 int process_cmd(Mandelparam * param, int argc, char * argv[]);
 int mandel_param_init(Mandelparam * param, int pksz, float stpx, float stpy, float rmax, const char * tfile);
-
-inline void Mandelbrot128(void *, int *, Transform *);
-inline void Mandelbrot256(void *, int *, Transform *);
-inline void Mandelbrot4(void *, int *, Transform *);
-
-int SDL_Mandelbrot(void *, int *);

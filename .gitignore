@@ -2,3 +2,7 @@
 *.d
 run
 *.txt
+.vscode
+bin
+info
+venv
