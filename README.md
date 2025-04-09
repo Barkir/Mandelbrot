@@ -177,8 +177,7 @@
 
 | Версия       | Среднее время (с) | Погрешность (σ) | Ускорение (раз) | График распределения |
 |--------------|-------------------|-----------------|-----------------|----------------------|
-| **DEFAULT**  | 0.507192          | ±1.38×10⁻⁵      | 1.00 (база)     | ![image](https://github.com/user-attachments/assets/24fb54f7-a0d9-4ddb-8fe1-18db4cd3a958)
- |
+| **DEFAULT**  | 0.507192          | ±1.38×10⁻⁵      | 1.00 (база)     | ![image](https://github.com/user-attachments/assets/24fb54f7-a0d9-4ddb-8fe1-18db4cd3a958) |
 | **ARRAY**    | 0.1309352         | ±2×10⁻⁶         | 3.9            | ![image](https://github.com/user-attachments/assets/3e872112-376d-4cb1-9223-f34f380cc272) |
 | **SSE**      | 0.130024          | ±1.9×10⁻⁶          | 3.87            | ![image](https://github.com/user-attachments/assets/c699f956-1aa8-40be-823f-154a970d7778) |
 | **AVX**      | 0.0707701         | ±6×10⁻⁷         | 7.14            | ![image](https://github.com/user-attachments/assets/cc7897ec-df82-4b37-90f5-9d36f23f85eb) |
