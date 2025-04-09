@@ -7,6 +7,7 @@
 #include <xmmintrin.h>
 #include <emmintrin.h>
 #include <immintrin.h>
+#include <avxintrin.h>
 #include <cpuid.h>
 
 #include <SDL2/SDL.h>
@@ -41,13 +42,13 @@ int SDL_Mandelbrot       (void *, int *);
 int main(int argc, char * argv[])
 {
     int * mandelbrot = NULL;
+    uint64_t start = 0, end = 0;
+    Transform mat = {1, 0, 0};
     Mandelparam param = {};
 
     if (process_cmd(&param, argc, argv) < 0) return 0;
 
-    uint64_t start = 0, end = 0;
 
-    Transform mat = {1, 0, 0};
 
     if (param.graph_flag == SSE_NGRAPH)
     {
@@ -58,6 +59,7 @@ int main(int argc, char * argv[])
         {
             mandelbrot = (int*) aligned_alloc(param.pksz * 4, SDL_SCREEN_HEIGHT * SDL_SCREEN_WIDTH * sizeof(int));
 
+            if (!mandelbrot) return SSE_MEMALLOC_ERROR;
             start = _rdtsc();
             param.func(&param, mandelbrot, &mat);
             end = _rdtsc();
@@ -71,10 +73,11 @@ int main(int argc, char * argv[])
         return 0;
     }
 
-
     mandelbrot = (int*) aligned_alloc(param.pksz * 4, SDL_SCREEN_HEIGHT * SDL_SCREEN_WIDTH * sizeof(int));
+    if (!mandelbrot) return SSE_MEMALLOC_ERROR;
     SDL_Mandelbrot(&param, mandelbrot);
     free(mandelbrot);
+    return 0;
 
 }
 
@@ -96,10 +99,6 @@ int process_cmd(Mandelparam * param, int argc, char * argv[])
 
                 case 4:     mandel_param_init(param, 4, 2.f / SDL_SCREEN_WIDTH, 2.f / SDL_SCREEN_HEIGHT, 4, "info/mandel4.txt");
                             param->func = Mandelbrot4;
-                            break;
-
-                case 512:   mandel_param_init(param, 16, 2.f / SDL_SCREEN_WIDTH, 2.f / SDL_SCREEN_HEIGHT, 4, "info/mandel512.txt");
-                            param->func = Mandelbrot512;
                             break;
 
                 case 1:     mandel_param_init(param, 1, 2.f / SDL_SCREEN_WIDTH, 2.f / SDL_SCREEN_HEIGHT, 4, "info/mandeldefault.txt");
@@ -180,7 +179,7 @@ inline void Mandelbrot128(void * p, int * dots, void * m)
                 if (mask2int == 0x00)
                 {
                     alignas(16) int integers[4] = {};
-                    _mm_store_epi32(integers, iter);
+                    _mm_store_si128((__m128i*)integers, iter);
 
                     for (int i = 0; i < param->pksz; i++)
                         dots[(x + i) + y * SDL_SCREEN_HEIGHT] = integers[i];
@@ -237,7 +236,7 @@ inline void Mandelbrot256(void * p, int * dots, void * m)
             for (int i = 0; i < Niter; i++)
             {
                 z_y = _mm256_add_ps(_mm256_mul_ps(_mm256_mul_ps(z_y, z_x), _mm256_set1_ps(2)), _mm256_add_ps(_mm256_mul_ps(y0, _mm256_set1_ps(ampl)), mdely));
-                z_x = _mm256_add_ps(_mm256_sub_ps(z_x2, z_y2), _mm256_add_ps(_mm256_mul_ps(x0, _mm256_set1_ps(ampl)), mdely));
+                z_x = _mm256_add_ps(_mm256_sub_ps(z_x2, z_y2), _mm256_add_ps(_mm256_mul_ps(x0, _mm256_set1_ps(ampl)), mdelx));
 
                 __m256 r2 = _mm256_add_ps(z_x2, z_y2);
                 __m256 mask = _mm256_cmp_ps(r2, rmax, _CMP_LT_OS);
@@ -246,7 +245,7 @@ inline void Mandelbrot256(void * p, int * dots, void * m)
                 if (mask2int == 0x00)
                 {
                     alignas(32) int integers[8] = {};
-                    _mm256_storeu_epi32(integers, iter);
+                    _mm256_store_si256((__m256i*)integers, iter);
 
                     for (int i = 0; i < param->pksz; i++)
                         dots[(x + i) + y * SDL_SCREEN_HEIGHT] = integers[i];
@@ -260,75 +259,6 @@ inline void Mandelbrot256(void * p, int * dots, void * m)
     }
 }
 
-    /*- - - - - - - - - - - - - - - - - - - - </> - - - - - - - - - - - - - - - - - - */
-    /*- - - - - - - - - - - - - - - - - -  <WARNING!> - - - - - - - - - - - - - - - - */
-    /*                          NOT SUPPORTED ON SOME CPUS (LIKE AMD)                 */
-
-inline void Mandelbrot512(void * p, int * dots, void * m)
-{
-    int * dots_pointer = dots;
-
-    Mandelparam * param = (Mandelparam*) p;
-    Transform * mat = (Transform*) m;
-
-    float ampl = mat->ampl;
-    float dely = mat->dely;
-    float delx = mat->delx;
-
-    alignas(64) __m512 mdelx = _mm512_set1_ps(delx);
-    alignas(64) __m512 mdely = _mm512_set1_ps(dely);
-
-
-    alignas(64) __m512 dy =   _mm512_set1_ps(2.0 / SDL_SCREEN_HEIGHT);
-    alignas(64) __m512 dx =   _mm512_set1_ps(2.0 / SDL_SCREEN_WIDTH * 16);
-    alignas(64) __m512 sdx =  _mm512_set1_ps(2.0 / SDL_SCREEN_WIDTH);
-
-    alignas(64) __m512 bias = _mm512_set_ps(15.f, 14.f, 13.f, 12.f, 11.f, 10.f, 9.f, 8.f, 7.f, 6.f, 5.f, 4.f, 3.f, 2.f, 1.f, 0.f);
-    alignas(64) __m512 rmax = _mm512_set1_ps(4);
-
-    alignas(64) __m512 y0 = _mm512_set1_ps(-1.0f);
-
-    for (int y = 0; y < SDL_SCREEN_HEIGHT; y++, y0 = _mm512_add_ps(y0, dy))
-    {
-                LOG("HELLO");
-        alignas(64) __m512 x0 = _mm512_add_ps(_mm512_mul_ps(bias, sdx), _mm512_set1_ps(-1.f));
-
-        for (int x = 0; x < SDL_SCREEN_WIDTH; x += param->pksz, x0 = _mm512_add_ps(x0, dx))
-        {
-
-            alignas(64) __m512 z_x      = _mm512_setzero_ps();
-            alignas(64) __m512 z_y      = _mm512_setzero_ps();
-            alignas(64) __m512 z_x2     = _mm512_setzero_ps();
-            alignas(64) __m512 z_y2     = _mm512_setzero_ps();
-            alignas(64) __m512i iter    = _mm512_setzero_si512();
-
-            volatile int it = 0;
-
-            for (int i = 0; i < Niter; i++)
-            {
-                z_y = _mm512_add_ps(_mm512_mul_ps(_mm512_mul_ps(z_y, z_x), _mm512_set1_ps(2)), y0);
-                z_x = _mm512_add_ps(_mm512_sub_ps(z_x2, z_y2), x0);
-
-                alignas(64) __m512 r2 = _mm512_add_ps(z_x2, z_y2);
-                alignas(64) __mmask16 mask = _mm512_cmple_ps_mask(r2, rmax);
-                alignas(64) __m512i mask_vector = _mm512_maskz_set1_epi32(mask, 1);
-                iter = _mm512_sub_epi32(iter, mask_vector);
-                if (mask == 0)
-                {
-                    alignas(64) int integers[16] = {};
-                    _mm512_store_epi32(integers, iter);
-
-                    for (int i = 0; i < param->pksz; i++)
-                        dots[(x + i) + y * SDL_SCREEN_HEIGHT] = integers[i];
-
-                    break;
-                }
-                z_x2 = _mm512_mul_ps(z_x, z_x);
-                z_y2 = _mm512_mul_ps(z_y, z_y);
-            }
-        }
-    }
-}
     /*- - - - - - - - - - - - - - - - - - - - </> - - - - - - - - - - - - - - - - - - */
 
 inline void Mandelbrot4(void * p, int * dots, void * m)
@@ -352,8 +282,8 @@ inline void Mandelbrot4(void * p, int * dots, void * m)
             float mask[4]   = {};
             float rmax[4]   = {4.f, 4.f, 4.f, 4.f};
 
-            volatile int it = 0;
-            for (; it < Niter; it++)
+            float it[4] = {0, 0, 0, 0};
+            for (int iters = 0; iters < Niter; iters++)
             {
                 mul4(z_y, z_x, z_y);
                 mulnum(z_y, 2, z_y);
@@ -362,14 +292,12 @@ inline void Mandelbrot4(void * p, int * dots, void * m)
                 add4(z_x, x0, z_x);
                 add4(z_x2, z_y2, r4);
                 cmple4(r4, rmax, mask);
+                add4(mask, it, it);
 
                 if (isnull4(mask))
                 {
-                    for (int c = 0; c < 4; c++)
-                    {
-                        *dots_pointer = it;
-                        dots_pointer++;
-                    }
+                    for (int i = 0; i < 4; i++)
+                        dots[(x + i) + y * SDL_SCREEN_HEIGHT] = it[i];
                     break;
                 }
                 mul4(z_x, z_x, z_x2);
@@ -406,8 +334,7 @@ inline void Mandelbrot(void * p, int * dots, void * m)
 
                 if (z_x2 + z_y2 > rmax)
                 {
-                    *dots_pointer = it;
-                    dots_pointer++;
+                    dots[x + y * SDL_SCREEN_WIDTH] = it;
                     break;
                 }
 
@@ -454,17 +381,16 @@ int SDL_Mandelbrot(void * p, int * dots)
                     switch(event.key.keysym.scancode)
                     {
                         case SDL_SCANCODE_W:
-                            mat.dely += 0.1;
+                            mat.dely += 0.1 * mat.ampl;
                             break;
                         case SDL_SCANCODE_S:
-                            mat.dely -= 0.1;
+                            mat.dely -= 0.1 * mat.ampl;
                             break;
-
                         case SDL_SCANCODE_D:
-                            mat.delx -= 0.1;
+                            mat.delx -= 0.1 * mat.ampl;
                             break;
                         case SDL_SCANCODE_A:
-                            mat.delx += 0.1;
+                            mat.delx += 0.1 * mat.ampl;
                             break;
 
                         case SDL_SCANCODE_P:
@@ -499,8 +425,8 @@ int SDL_Mandelbrot(void * p, int * dots)
 
             }
         }
-
         SDL_RenderPresent(renderer);
+        memset(dots, 0, sizeof(int) * SDL_SCREEN_WIDTH * SDL_SCREEN_HEIGHT);
     }
 
     SDL_DestroyWindow(window);

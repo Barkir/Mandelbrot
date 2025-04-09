@@ -3,8 +3,8 @@ TARGET = run
 
 OFLAG ?= -O2
 
-CFLAGS_RELEASE = -mavx -mavx2 -mfma -mavx512vl $(OFLAG) -Iinclude -Wall -pedantic -pedantic-errors -g3 -std=gnu++20 -DNDEBUG $(shell sdl2-config --cflags)
-CFLAGS_DEBUG = -mavx -mavx2 -mfma -mavx512vl $(OFLAG) -Iinclude -Wall -pedantic -pedantic-errors -g3 -std=gnu++20 -fsanitize=address $(shell sdl2-config --cflags)
+CFLAGS_RELEASE = -mavx -mavx2 -mfma $(OFLAG) -Iinclude -Wall -pedantic -pedantic-errors -g3 -std=gnu++20 -DNDEBUG $(shell sdl2-config --cflags)
+CFLAGS_DEBUG = -mavx -mavx2 -mfma $(OFLAG) -Iinclude -Wall -pedantic -pedantic-errors -g3 -std=gnu++20 -fsanitize=address $(shell sdl2-config --cflags)
 LDFLAGS=$(shell sdl2-config --libs) -lSDL2 -lSDL2_image
 DEPFLAGS = -MMD -MP
 

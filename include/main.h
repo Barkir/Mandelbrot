@@ -38,7 +38,8 @@ enum Mandelflags
     SSE_VEC,
     SSE_SNGL,
 
-    SSE_FILE_OPEN_ERROR
+    SSE_FILE_OPEN_ERROR,
+    SSE_MEMALLOC_ERROR
 };
 
 struct Transform
