@@ -1,3 +1,16 @@
+# Сборка
+1. Клонируем репозиторий ```git clone https://github.com/Barkir/Mandelbrot```
+2. Собираем (доступен выбор компилятора: ```make CC=clang // make CC=g++```
+3. Запускаем ```./run```
+
+## Опции запуска
+| Grpahics Mode | Optimization | Iterations |
+|---------------|--------------|------------|
+|  ```--ngraph/--graph```| ```1 (default) 4(array mode) 128(SSE) 256(AVX)``` | ```number of iterations```
+
+
+
+
 # Ускорение построения множества мандельброта с использованием SIMD.
 **Цели работы**
 - Рассчитать множество мандельброта
@@ -26,6 +39,10 @@
   |------|------|
   | Ubuntu 24.10 | AMD Ryzen 7 6800H with Radeon Graphics            3.20 GHz |
   | DESKTOP-JTSUO0I       | 16 GB RAM                                                  |
+  | Ubuntu clang version 19.1.1 (1ubuntu1) |
+  | gcc (Ubuntu 14.2.0-4ubuntu2) 14.2.0    |
+
+
 
   ## Ход работы
   ### Реализация без SIMD
@@ -123,12 +140,14 @@
 
 # Визуализация
 
-| Версия программы | Множество Мандельброта |  GodBolt |
-|------------------|------------------------|----------|
-| Default          | ![image](https://github.com/user-attachments/assets/7432eb2d-d672-43b6-b2ae-9b0c3e6e64ae) | [-> Compiler Explorer <-](https://godbolt.org/z/7oca99vaW)
-| Array            | ![image](https://github.com/user-attachments/assets/966d648d-5f4b-4000-9285-4d7ab926cb89) | [-> Compiler Explorer <-](https://godbolt.org/z/5Yjoh9sjv)
-| SSE            | ![image](https://github.com/user-attachments/assets/b49dcbb9-b2ba-4684-8d93-6540f1b775b8) |   [-> Compiler Explorer <-](https://godbolt.org/z/Md5ha8Ea1)
-| AVX            | ![image](https://github.com/user-attachments/assets/b49dcbb9-b2ba-4684-8d93-6540f1b775b8) |   [-> Compiler Explorer <-](https://godbolt.org/z/Md5ha8Ea1)
+![image](https://github.com/user-attachments/assets/b49dcbb9-b2ba-4684-8d93-6540f1b775b8)
+
+| Версия программы | GodBolt |
+|------------------|----------|
+| Default          | [-> Compiler Explorer <-](https://godbolt.org/z/7oca99vaW)
+| Array            | [-> Compiler Explorer <-](https://godbolt.org/z/5Yjoh9sjv)
+| SSE            | [-> Compiler Explorer <-](https://godbolt.org/z/Md5ha8Ea1)
+| AVX            | [-> Compiler Explorer <-](https://godbolt.org/z/Md5ha8Ea1)
 
 
 
