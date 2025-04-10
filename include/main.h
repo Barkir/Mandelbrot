@@ -17,29 +17,32 @@
 #endif
 
 const int Niter = 256;
-const float rMax = 4;
+const float Rmax = 4;
 
 const int SDL_SCREEN_WIDTH = 1200;
 const int SDL_SCREEN_HEIGHT = 1200;
 
-const float step_x = 2.0 / SDL_SCREEN_WIDTH;
-const float step_y = 2.0 / SDL_SCREEN_HEIGHT;
+const float StepX = 2.0 / SDL_SCREEN_WIDTH;
+const float StepY = 2.0 / SDL_SCREEN_HEIGHT;
 
 
-enum Mandelflags
+enum MandelFlags
 {
-    SSE_GRAPH,
-    SSE_NGRAPH,
-    SSE_DEFAULT,
+    MANDEL_GRAPH,
+    MANDEL_NGRAPH,
+    MANDEL_DEFAULT,
 
-    SSE_128,
-    SSE_256,
-    SSE_512,
-    SSE_VEC,
-    SSE_SNGL,
+    MANDEL_SSE,
+    MANDEL_AVX,
+    MANDEL_AVX512,
+    MANDEL_ARRAY,
+    MANDEL_SINGLE,
 
-    SSE_FILE_OPEN_ERROR,
-    SSE_MEMALLOC_ERROR
+    MANDEL_FILE_OPEN_ERROR,
+    MANDEL_MEMALLOC_ERROR,
+    MANDEL_UNKNOWN_OPTIMIZATION_ERROR,
+    MANDEL_PROCESS_CMD_ERROR
+
 };
 
 struct Transform
@@ -49,21 +52,19 @@ struct Transform
     float dely;
 };
 
-typedef void (*Mandelfunc) (void*, int*, void *);
+typedef void (*MandelFunc) (void*, int*);
 
-struct Mandelparam
+struct MandelSettings
 {
-    int pksz;
-    float stpx;
-    float stpy;
-    float rmax;
-    int iter;
-    const char * tfile;
-    int graph_flag;
+    int PackSize;
+    float StepX;
+    float StepY;
+    float Rmax;
+    int NumIter;
+    const char * FileName;
+    int GraphFlag;
 
-    Mandelfunc func;
+    MandelFunc Function;
+    Transform TransMat;
 
 };
-
-int process_cmd(Mandelparam * param, int argc, char * argv[]);
-int mandel_param_init(Mandelparam * param, int pksz, float stpx, float stpy, float rmax, const char * tfile);
