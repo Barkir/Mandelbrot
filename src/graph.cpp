@@ -21,7 +21,6 @@ int SDLMandelbrotExecute(void * paramPointer)
 int SDLMandelbrot(void * paramPointer, int * dots)
 {
     MandelSettings * param = (MandelSettings*) paramPointer;
-    Transform mat = param->TransMat;
 
     if (!SDL_Init(SDL_INIT_EVERYTHING)) return 1;
 
@@ -53,24 +52,24 @@ int SDLMandelbrot(void * paramPointer, int * dots)
                     switch(event.key.keysym.scancode)
                     {
                         case SDL_SCANCODE_W:
-                            mat.dely += 0.1 * mat.ampl;
+                            param->TransMat.dely += 0.1 * param->TransMat.ampl;
                             break;
                         case SDL_SCANCODE_S:
-                            mat.dely -= 0.1 * mat.ampl;
+                            param->TransMat.dely -= 0.1 * param->TransMat.ampl;
                             break;
                         case SDL_SCANCODE_D:
-                            mat.delx -= 0.1 * mat.ampl;
+                            param->TransMat.delx -= 0.1 * param->TransMat.ampl;
                             break;
                         case SDL_SCANCODE_A:
-                            mat.delx += 0.1 * mat.ampl;
+                            param->TransMat.delx += 0.1 * param->TransMat.ampl;
                             break;
 
                         case SDL_SCANCODE_P:
-                            mat.ampl *= 1.1;
+                            param->TransMat.ampl *= 1.1;
                             break;
 
                         case SDL_SCANCODE_O:
-                            mat.ampl /= 1.1;
+                            param->TransMat.ampl /= 1.1;
                             break;
 
                         default: break;

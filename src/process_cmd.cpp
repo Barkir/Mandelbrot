@@ -80,6 +80,7 @@ const char * Err2Str(int error)
         case MANDEL_MEMALLOC_ERROR:             return "MEMALLOC_ERROR";
         case MANDEL_UNKNOWN_OPTIMIZATION_ERROR: return "UNKNOW_OPTIMIZATION_ERROR";
         case MANDEL_PROCESS_CMD_ERROR:          return "PROCESS_CMD_ERROR";
+        case MANDEL_NULLPOINTER_ERROR:          return "NULLPOINTER_ERROR";
         case MANDEL_DEFAULT:                    return "DEFAULT";
         default:                                return "UNKNOWN";
     }

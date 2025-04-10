@@ -7,6 +7,8 @@
 #include <immintrin.h>
 #include <avxintrin.h>
 
+#include <string.h>
+
 void inline print4  (float *);
 void inline add4    (float *, float *, float *);
 void inline sub4    (float *, float *, float *);
@@ -84,10 +86,11 @@ inline void Mandelbrot128(void * paramPointer, int * dots)
 inline void Mandelbrot256(void * paramPointer, int * dots)
 {
     MandelSettings * param = (MandelSettings*) paramPointer;
+    Transform mat = param->TransMat;
 
-    float ampl = param->TransMat.ampl;
-    float delx = param->TransMat.delx;
-    float dely = param->TransMat.dely;
+    float ampl = mat.ampl;
+    float delx = mat.delx;
+    float dely = mat.dely;
 
     alignas(32) __m256 mdely = _mm256_set1_ps(dely);
     alignas(32) __m256 mdelx = _mm256_set1_ps(delx);
@@ -125,10 +128,11 @@ inline void Mandelbrot256(void * paramPointer, int * dots)
                 if (mask2int == 0x00)
                 {
                     alignas(32) int integers[8] = {};
-                    _mm256_store_si256((__m256i*)integers, iter);
+                    // _mm256_store_si256((__m256i*)integers, iter);
 
-                    for (int i = 0; i < param->PackSize; i++)
-                        dots[(x + i) + y * SDL_SCREEN_HEIGHT] = integers[i];
+                    memcpy(dots + x + y * SDL_SCREEN_HEIGHT, &iter, param->PackSize * sizeof(int));
+                    // for (int i = 0; i < param->PackSize; i++)
+                    //     dots[(x + i) + y * SDL_SCREEN_HEIGHT] = integers[i];
 
                     break;
                 }
@@ -251,7 +255,7 @@ void inline mulnum(float * a, float val, float * save)
 
 void inline cpy4(float * a, float * b)
 {
-    for (int i = 0; i < 4; i++) a[i] = b[i];
+    memcpy(a, b, sizeof(float) * 4);
 }
 
 void inline cmple4(float * a, float * b, float * save)
