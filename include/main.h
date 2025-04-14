@@ -19,11 +19,11 @@
 const int Niter = 256;
 const float Rmax = 4;
 
-const int SDL_SCREEN_WIDTH = 1200;
-const int SDL_SCREEN_HEIGHT = 1200;
+const int SDL_SCREEN_WIDTH = 800;
+const int SDL_SCREEN_HEIGHT = 800;
 
-const float StepX = 2.0 / SDL_SCREEN_WIDTH;
-const float StepY = 2.0 / SDL_SCREEN_HEIGHT;
+const float StepX = 2.0 / (SDL_SCREEN_WIDTH - 1);
+const float StepY = 2.0 / (SDL_SCREEN_HEIGHT - 1);
 
 
 enum MandelFlags

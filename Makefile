@@ -5,7 +5,7 @@ OFLAG ?= -O2
 
 CFLAGS_RELEASE = -mavx -mavx2 -mfma $(OFLAG) -Iinclude -Wall -pedantic -pedantic-errors -g3 -std=gnu++20 -DNDEBUG $(shell sdl2-config --cflags)
 CFLAGS_DEBUG = -mavx -mavx2 -mfma -O0 -Iinclude -Wall -pedantic -pedantic-errors -g3 -std=gnu++20 -fsanitize=address $(shell sdl2-config --cflags)
-LDFLAGS=$(shell sdl2-config --libs) -lSDL2 -lSDL2_image
+LDFLAGS=$(shell sdl2-config --libs) -lSDL2 -lSDL2_image -lSDL2_ttf
 DEPFLAGS = -MMD -MP
 
 SRC_DIR = src

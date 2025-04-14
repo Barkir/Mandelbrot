@@ -60,16 +60,7 @@ inline void Mandelbrot128(void * paramPointer, int * dots)
                 alignas(16) __m128 mask = _mm_cmple_ps(r2, rmax);
                 int mask2int = _mm_movemask_ps(mask);
                 if (mask2int == 0x00)
-                {
-                    alignas(16) int integers[4] = {};
-                    _mm_store_si128((__m128i*)integers, iter);
-
-                    for (int i = 0; i < param->PackSize; i++)
-                        dots[(x + i) + y * SDL_SCREEN_HEIGHT] = integers[i];
-
                     break;
-                }
-
                 z_y = _mm_add_ps(_mm_mul_ps(_mm_mul_ps(z_y, z_x), _mm_set_ps1(2.f)), _mm_add_ps(_mm_mul_ps(y0, _mm_set_ps1(ampl)), _mm_set_ps1(dely)));        /*<<< z_y = 2 * z_y * z_x + y0 >>>*/
                 z_x = _mm_add_ps(_mm_sub_ps(z_x2, z_y2), _mm_add_ps(_mm_mul_ps(x0, _mm_set_ps1(ampl)), _mm_set_ps1(delx)));                                    /*<<< z_x = z_x2 - z_y2 + x0 >>>*/
 
@@ -77,6 +68,8 @@ inline void Mandelbrot128(void * paramPointer, int * dots)
                 z_x2 = _mm_mul_ps(z_x, z_x);
                 z_y2 = _mm_mul_ps(z_y, z_y);
             }
+
+            memcpy(dots + x + y * SDL_SCREEN_WIDTH, &iter, param->PackSize * sizeof(int));
         }
     }
 }
@@ -126,19 +119,12 @@ inline void Mandelbrot256(void * paramPointer, int * dots)
                 iter = _mm256_sub_epi32(iter, _mm256_castps_si256(mask));
                 int mask2int = _mm256_movemask_ps(mask);
                 if (mask2int == 0x00)
-                {
-                    alignas(32) int integers[8] = {};
-                    // _mm256_store_si256((__m256i*)integers, iter);
-
-                    memcpy(dots + x + y * SDL_SCREEN_HEIGHT, &iter, param->PackSize * sizeof(int));
-                    // for (int i = 0; i < param->PackSize; i++)
-                    //     dots[(x + i) + y * SDL_SCREEN_HEIGHT] = integers[i];
-
                     break;
-                }
                 z_x2 = _mm256_mul_ps(z_x, z_x);
                 z_y2 = _mm256_mul_ps(z_y, z_y);
             }
+
+            memcpy(dots + x + y * SDL_SCREEN_WIDTH, &iter, param->PackSize * sizeof(int));
         }
     }
 }
@@ -178,14 +164,13 @@ inline void Mandelbrot4(void * paramPointer, int * dots)
                 add4(mask, it, it);
 
                 if (isnull4(mask))
-                {
-                    for (int i = 0; i < 4; i++)
-                        dots[(x + i) + y * SDL_SCREEN_HEIGHT] = it[i];
                     break;
-                }
                 mul4(z_x, z_x, z_x2);
                 mul4(z_y, z_y, z_y2);
             }
+
+            for (int i = 0; i < 4; i++)
+                dots[(x + i) + y * SDL_SCREEN_WIDTH] = it[i];
         }
     }
 }
