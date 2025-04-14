@@ -21,46 +21,79 @@ int MandelSettingsCtor(MandelSettings * param, int pksz, float stpx, float stpy,
 int ProcessCmd(MandelSettings * param, int argc, char * argv[])
 {
 
-
-    if (argc == 4)
+    if (argc >= 3)
     {
+    if (!strcmp(argv[1], "--graph"))
+    {
+        param->GraphFlag = MANDEL_GRAPH;
+        if (!strcmp(argv[2], "-sse"))
+        {
+            MandelSettingsCtor(param, 4, StepX, StepY, Rmax, "info/mandel128.txt");
+            param->Function = Mandelbrot128;
+        }
+        else if (!strcmp(argv[2], "-avx"))
+        {
+            MandelSettingsCtor(param, 8, StepX, StepY, Rmax, "info/mandel256.txt");
+            param->Function = Mandelbrot256;
+        }
+        else if (!strcmp(argv[2], "-array"))
+        {
+            MandelSettingsCtor(param, 4, StepX, StepY, Rmax, "info/mandel4.txt");
+            param->Function = Mandelbrot4;
+        }
+        else if (!strcmp(argv[2], "-def"))
+        {
+            MandelSettingsCtor(param, 1, StepX, StepY, Rmax, "info/mandeldefault.txt");
+            param->Function = Mandelbrot;
+        }
+        else
+        {
+            MandelSettingsCtor(param, 1, StepX, StepY, Rmax, "info/mandeldefault.txt");
+            param->Function = Mandelbrot;
+        }
+        return MANDEL_GRAPH;
+    }
 
-        switch (atoi(argv[2]))
+    if (!strcmp(argv[1], "--ngraph"))
+    {
+        if (argc == 4)
+        {
+
+
+            if (!strcmp(argv[2], "-sse"))
             {
-                case 128:   MandelSettingsCtor(param, 4, StepX, StepY, Rmax, "info/mandel128.txt");
-                            param->Function = Mandelbrot128;
-                            break;
-
-                case 256:   MandelSettingsCtor(param, 8, StepX, StepY, Rmax, "info/mandel256.txt");
-                            param->Function = Mandelbrot256;
-                            break;
-
-                case 4:     MandelSettingsCtor(param, 4, StepX, StepY, Rmax, "info/mandel4.txt");
-                            param->Function = Mandelbrot4;
-                            break;
-
-                case 1:     MandelSettingsCtor(param, 1, StepX, StepY, Rmax, "info/mandeldefault.txt");
-                            param->Function = Mandelbrot;
-                            break;
-
-
-                default:    return MandelError(MANDEL_UNKNOWN_OPTIMIZATION_ERROR);
+                MandelSettingsCtor(param, 4, StepX, StepY, Rmax, "info/mandel128.txt");
+                param->Function = Mandelbrot128;
             }
 
-        if (!strcmp(argv[1], "--ngraph"))
-        {
 
-            param->NumIter = atoi(argv[3]);
-            param->GraphFlag = MANDEL_NGRAPH;
-            return MANDEL_NGRAPH;
+            else if (!strcmp(argv[2], "-avx"))
+            {
+                MandelSettingsCtor(param, 8, StepX, StepY, Rmax, "info/mandel256.txt");
+                param->Function = Mandelbrot256;
+            }
+
+            else if (!strcmp(argv[2], "-array"))
+            {
+                MandelSettingsCtor(param, 4, StepX, StepY, Rmax, "info/mandel4.txt");
+                param->Function = Mandelbrot4;
+            }
+
+            else if (!strcmp(argv[2], "-def"))
+            {
+                MandelSettingsCtor(param, 1, StepX, StepY, Rmax, "info/mandeldefault.txt");
+                param->Function = Mandelbrot;
+            }
+
+            else
+            {
+                MandelSettingsCtor(param, 1, StepX, StepY, Rmax, "info/mandeldefault.txt");
+                param->Function = Mandelbrot;
+            }
         }
 
-        else if (!strcmp(argv[1], "--graph"))
-        {
-            param->NumIter = atoi(argv[3]);
-            param->GraphFlag = MANDEL_GRAPH;
-            return MANDEL_GRAPH;
-        }
+        return MANDEL_NGRAPH;
+    }
     }
 
     return -fprintf(stderr, "Typo in: ./run <--ngraph/--graph> <optimization mode> <iterations number>\n");

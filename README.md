@@ -1,14 +1,41 @@
+# MandelBrot Research
+```
+Author: BARKIR
+HELPERS: BRYANT O'HALLARON && APHEX TWIN (・_・)ゞ
+```
+
+
 # Сборка
 1. Клонируем репозиторий ```git clone https://github.com/Barkir/Mandelbrot```
-2. Собираем (доступен выбор компилятора: ```make CC=clang // make CC=g++```
+2. Собираем (доступен выбор компилятора: ```make CC=clang // make CC=g++```)
 3. Запускаем ```./run``` + флаги
 
 ## Опции запуска
 | Grpahics Mode | Optimization | Iterations |
 |---------------|--------------|------------|
-|  ```--ngraph/--graph```| ```1 (default) 4(array mode) 128(SSE) 256(AVX)``` | ```number of iterations```
+|  ```--ngraph/--graph```| ```-def // -array // -sse // -avx``` | ```number of iterations (ngraph mode only)```
 
 
+## Структуа проекта
+
+```
+├── bin 
+├── consolas.ttf
+├── include
+│   ├── graph.h
+│   ├── main.h
+│   ├── ngraph.h
+│   └── process_cmd.h
+├── Makefile
+├── README.md
+├── run
+└── src
+    ├── graph.cpp
+    ├── main.cpp
+    ├── ngraph.cpp
+    └── process_cmd.cpp
+
+```
 
 
 # Ускорение построения множества мандельброта с использованием SIMD.
